@@ -1,6 +1,4 @@
-
 package com.zizmax.HavocGames;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,55 +19,34 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
-import com.zizmax.HavocGames.MySQL;
 import com.zizmax.HavocGames.Chat;
 
-
-//TODO ****** Log in any-time, may not be able to play (TP's and abilities set correctly based on state of game) *******
-// TODO Seperate command executor
-// TODO Admin mode chat channel
-// TODO Admin mode updates and stats
-// TODO Staff perms (/broadcast, /start.....)
-// TODO Selecting world, copying world, deleting world, repeat
-
-// BUG Teams are not correctly made *** Not test yet, may be working now ***
-// BUG Not dropping coins when killed by player bow
-// BUG Not correctly checking for/assigning the staff names String list, or tips or perks
-// BUG MySQL doesn't connect, etc....
-
 public final class HavocGames extends JavaPlugin{
-	// pre uses public to be accessed from other classes because its value never changes. I'm pretty sure the other stuff needs to use getters and setters.
-    public String pre = ChatColor.GRAY + "[" + ChatColor.GOLD + "HG" + ChatColor.GRAY + "] "; // ALWAYS use in GUI strings!
-    public boolean gameHasStarted = false; // A boolean showing if the game has started or not.
-    public static int secs = 0; // Time, in seconds, that the game has lasted
-    public static ArrayList<Player> players;
-    public static ArrayList<Player> watchers;
+    public String pre = ChatColor.GRAY + "[" + ChatColor.GOLD + "HG" + ChatColor.GRAY + "] ";
+    public boolean gameHasStarted = false;
+    public int secs = 0;
+    public ArrayList<Player> players;
+    public ArrayList<Player> watchers;
    
-    public static List<String> owners;
-    public static List<String> helpers;
-    public static List<String> srmods;
-    public static List<String> mods;
-    public static List<String> sradmins;
+    public List<String> owners;
+    public List<String> helpers;
+    public List<String> srmods;
+    public List<String> mods;
+    public List<String> sradmins;
     
-    public static List<String> green; 
-    public static List<String> red;
+    public List<String> green; 
+    public List<String> red;
     
 
     
 	@Override
     public void onEnable(){
-        //MySQL.connect();
 		this.saveDefaultConfig();
-		List<String>ownerslist = this.getConfig().getStringList("staff.owners");
-		
-		String[] owners = (String[]) ownerslist.toArray();
-	    //for (String name : ownersnames){
-		//      owners.add(name);
-	    //}
+		owners = this.getConfig().getStringList("staff.owners");
 		sradmins= this.getConfig().getStringList("staff.sradmins");
 		helpers = this.getConfig().getStringList("staff.helpers");
 		getLogger().info(owners.toString());
-		getServer().getPluginManager().registerEvents(new listener(), this);
+		getServer().getPluginManager().registerEvents(new MainListener(this), this);
 		getLogger().info("HavocGames successfully enabled!");
 		scheduleAnnouncerTask(0L, 20L);
 	}
@@ -92,16 +69,16 @@ public final class HavocGames extends JavaPlugin{
 	}
 	*/
 	public boolean getGame(){
-		// Is supposed to be used to check what state the game is in, but also not able to be correctly used in listener.java
         return this.gameHasStarted;
 	}
+	
 	public void setGame(boolean gameHasStarted){
 		this.gameHasStarted = gameHasStarted;
 	}
+	
     @Override
     public void onDisable() {
     	getLogger().info("HavocGames successfully disabled!");
-
     }
     
     public BukkitTask scheduleAnnouncerTask(long initialWait, long repeatInterval){
@@ -113,16 +90,11 @@ public final class HavocGames extends JavaPlugin{
     	} , initialWait, repeatInterval);
     }
     
-
-    
     public int getTime(){
-         // Again, this works for getting the time in this class, but not in others. Listener.java gets 0, its initial value.
         return secs;
     }
     
-    
     public void setTime(int passedSecs){
-         // I really can't tell what exactly is happening with this, in some cases it seems to work, in others, it doesn't...
          secs = passedSecs + 1;
     }
     
@@ -149,39 +121,35 @@ public final class HavocGames extends JavaPlugin{
 		int playerAmount = Bukkit.getServer().getOnlinePlayers().length; // int of # of players
 		int half = playerAmount / 2; // half of the # of players
 		for (i = 0; i < Bukkit.getServer().getOnlinePlayers().length; i++){
-	      Player temp = Bukkit.getPlayer(Bukkit.getServer().getOnlinePlayers()[i].getName());
-	      temp.setGameMode(GameMode.SURVIVAL);
-	      temp.setFoodLevel(20);
-	      temp.setHealth(20);
-	      temp.setFlying(false);
-	      temp.teleport(loc);
-	      PlayerInventory inv = temp.getInventory();
-	      inv.clear();
-	      inv.setBoots(new ItemStack(Material.AIR));
-	      inv.setLeggings(new ItemStack(Material.AIR));
-	      inv.setChestplate(new ItemStack(Material.AIR));
-	      ItemStack lhelmet = new ItemStack(Material.LEATHER_HELMET, 1);
-	      LeatherArmorMeta lam = (LeatherArmorMeta)lhelmet.getItemMeta();
-	      lam.setColor(Color.fromRGB(205, 175, 149));
-	      lhelmet.setItemMeta(lam);
-	      inv.setHelmet(lhelmet);
-	      temp.setExp(-temp.getExp());
-	      if(i < half){
-	    	  temp.sendMessage(pre + "You are on team " + ChatColor.GREEN + "GREEN" + ChatColor.GRAY + "!");
-	    	  green.add(temp.getName());
-	      }
-	      if(i >= half){
-	    	  temp.sendMessage(pre + "You are on team " + ChatColor.RED + "RED" + ChatColor.GRAY + "!");
-	    	  red.add(temp.getName());
-	      }
-
+	        Player temp = Bukkit.getPlayer(Bukkit.getServer().getOnlinePlayers()[i].getName());
+	        temp.setGameMode(GameMode.SURVIVAL);
+	        temp.setFoodLevel(20);
+	        temp.setHealth(20);
+	        temp.setFlying(false);
+	        temp.teleport(loc);
+	        PlayerInventory inv = temp.getInventory();
+	        inv.clear();
+	        inv.setBoots(new ItemStack(Material.AIR));
+	        inv.setLeggings(new ItemStack(Material.AIR));
+	        inv.setChestplate(new ItemStack(Material.AIR));
+	        ItemStack lhelmet = new ItemStack(Material.LEATHER_HELMET, 1);
+	        LeatherArmorMeta lam = (LeatherArmorMeta)lhelmet.getItemMeta();
+	        lam.setColor(Color.fromRGB(205, 175, 149));
+	        lhelmet.setItemMeta(lam);
+	        inv.setHelmet(lhelmet);
+	        temp.setExp(-temp.getExp());
+	        if(i < half){
+	        	temp.sendMessage(pre + "You are on team " + ChatColor.GREEN + "GREEN" + ChatColor.GRAY + "!");
+	        	green.add(temp.getName());
+	        }
+	        if(i >= half){
+	        	temp.sendMessage(pre + "You are on team " + ChatColor.RED + "RED" + ChatColor.GRAY + "!");
+	        	red.add(temp.getName());
+	        }
 	    }
-		
 	    Chat.sayInfoMsg("The game has started!");
 	}
-	
 
-	
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
 		Player player = (Player) sender;
 		String noperm = pre + "You do not have permission!";
@@ -209,17 +177,15 @@ public final class HavocGames extends JavaPlugin{
     	if(cmd.getName().equalsIgnoreCase("stats")){
     		if (args.length == 0){
     			Chat.sayPlayerMsg(player, "Your score is " + "VALUE" + "!");
-                
-                
     		}
     		    else{
     			    Player target = (Bukkit.getServer().getPlayer(args[0]));
     			    if (target == null){
     			    	Chat.sayPlayerMsg(player, ChatColor.GREEN + args[0] + ChatColor.GRAY + " is not online!");
                     }
-                        else{
+                    else{
                         	Chat.sayPlayerMsg(player, args[0] + "'s score is " + "VALUE" + "!");
-                        }
+                    }
     		}
     	}
     	
@@ -381,7 +347,7 @@ public final class HavocGames extends JavaPlugin{
     		}
     		else{
     			ItemMeta itemmeta = itemstack.getItemMeta();
-    			itemmeta.setDisplayName("¤cObsidian Destroyer");
+    			itemmeta.setDisplayName("Â§cObsidian Destroyer");
     			itemstack.setItemMeta(itemmeta);
     			inventory.addItem(itemstack);
     			Chat.sayPlayerMsg(player, "There you go! Break the obsidian to win!");

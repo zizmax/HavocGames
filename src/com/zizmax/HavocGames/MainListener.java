@@ -1,7 +1,6 @@
 package com.zizmax.HavocGames;
 
 import com.zizmax.HavocGames.HavocGames;
-import com.zizmax.HavocGames.MySQL;
 import com.zizmax.HavocGames.Chat;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -28,11 +27,14 @@ import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.inventory.ItemStack;
 
 
-public class listener implements Listener{
-	HavocGames main = new HavocGames();
-	String pre = main.pre;
-	
-	
+public class MainListener implements Listener{
+	private final HavocGames main;
+
+	public MainListener(HavocGames plugin) {
+		this.main = plugin;
+	}
+	String pre = this.main.pre;
+
 	@EventHandler
 	public void playerLogin(PlayerJoinEvent event){
 		String name = event.getPlayer().getName();
@@ -41,30 +43,28 @@ public class listener implements Listener{
 	    Chat.sayPlayerMsg(player, "Website: " + ChatColor.DARK_AQUA +"zizmax.com" + ChatColor.GRAY + " <--- Click This");
 	    Chat.sayPlayerMsg(player, "Have fun and good luck!");
 	    player.sendMessage(pre + "Game will begin in " + ChatColor.WHITE + main.getTime() + ChatColor.GRAY + " seconds!");
-	    //MySQL.write(name, 27,0,0,0,0);
-		
-		// The line below is supposed to check if the player is an owner, but because the value isn't actually accessed it can't.
-		if(HavocGames.owners.contains(player.getName().toString())){
+
+		if(main.owners.contains(player.getName())){
 			event.setJoinMessage(pre + ChatColor.DARK_RED + player.getName() + ChatColor.YELLOW + " the [" + ChatColor.DARK_RED + "Owner" + ChatColor.YELLOW + "] has joined the game!");
 		}
-		if(HavocGames.sradmins.contains(player.getName().toString())){
+		if(main.sradmins.contains(player.getName().toString())){
 			event.setJoinMessage(pre + ChatColor.DARK_GRAY + player.getName() + ChatColor.YELLOW + " the [" + ChatColor.DARK_RED + "Sr" + ChatColor.DARK_GRAY + "Admin" + ChatColor.YELLOW + "] has joined the game!");
 		}
-		if(HavocGames.helpers.contains(player.getName().toString())){
+		if(main.helpers.contains(player.getName().toString())){
 			event.setJoinMessage(pre + ChatColor.GREEN + player.getName() + ChatColor.YELLOW + " the [" + ChatColor.GREEN + "Helper" + ChatColor.YELLOW + "] has joined the game!");
 		}
 
 			else{
 				event.setJoinMessage(pre + ChatColor.YELLOW + "Some normal idiot joined the game!");
 			}
-		
+
 		Location loc = player.getLocation();
 		loc.setX(126); loc.setY(60); loc.setZ(62);
 		player.teleport(loc);
 		player.setAllowFlight(true);	
 	}
-	
-	
+
+
 	// TODO For some reason, and I can't really see why, the coins do not drop when killed by a player's bow.
 	@EventHandler
 	public void onEntityDeath(EntityDeathEvent event){
@@ -86,8 +86,6 @@ public class listener implements Listener{
 	      if ((entity instanceof Player)) {
 	        Player playerKiller = event.getEntity().getKiller();
 	        playerKiller.sendMessage(pre + "You got " + "VALUE" + " points!");
-	        //HavocGames method = new HavocGames();
-	        //method.addScore(playerKiller);
 	        while (i < 20){
 				player.getWorld().dropItemNaturally(loc, itemstack);
 				i++;
@@ -115,15 +113,14 @@ public class listener implements Listener{
 		    player.sendMessage(pre + "-----------");
 		    	event.setCancelled(true);
 		    }
-
 	    }
-	    	
     }
+	
 	@EventHandler
 	public void onItemPickup(PlayerPickupItemEvent event){
 		Player player = event.getPlayer();
 		Item item = event.getItem();
-		
+
 		if(item.getItemStack().getType().toString().equals("GOLD_INGOT")){
 			if(item.getItemStack().getAmount() == 1){
 				player.sendMessage(pre + "You got " + ChatColor.DARK_PURPLE + "1" + ChatColor.GRAY + " coin!");
@@ -137,26 +134,24 @@ public class listener implements Listener{
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void onPlayerChat(AsyncPlayerChatEvent event){
-		
 		// TODO Make this look for title and score and rank
-		//MySQL.getPoints(event.getPlayer().getName())
 		event.setFormat(ChatColor.GRAY + "[" + ChatColor.DARK_RED + "SCORE" + ChatColor.GRAY + "] [" + ChatColor.DARK_GRAY + "TITLE" + ChatColor.GRAY + "]" + "%s: %s");
 	}
 	@EventHandler
 	public void onServerPing(ServerListPingEvent event){
 		event.setMaxPlayers(10);
 		if(!main.getGame()){
-			
+
 			event.setMotd(ChatColor.GREEN + "Game starting in " + ChatColor.WHITE + (60 - main.getTime()) + ChatColor.GREEN + " seconds!");
 		}
 		else{
 			event.setMotd(ChatColor.GREEN + "Game in progress. Login to spectate!");
 		}
 	}
-	
+
 	@EventHandler
 	public void onBlockDamage(BlockDamageEvent event){
 		Block block = event.getBlock();
@@ -176,10 +171,9 @@ public class listener implements Listener{
 		    player.sendMessage(pre + ChatColor.RED + "Nice try! You can " + ChatColor.DARK_RED + "ONLY" + ChatColor.RED + " break obsidian with the pickaxe!");
 			player.setItemInHand(null);
 			player.sendMessage(pre + ChatColor.RED + "You can get another pickaxe with " + ChatColor.AQUA + "/pick");
-		    	
 		}
-			
 	}
+	
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent event){
 		Block block = event.getBlock();
@@ -198,8 +192,8 @@ public class listener implements Listener{
 			Bukkit.broadcastMessage(pre + ChatColor.RED + player.getName() + ChatColor.GRAY + " just broke the obsidian! Game over!");
 			main.setTime(1900);
 		}
-		
 	}
+	
 	@EventHandler
 	public void onPlayerRespawn(PlayerRespawnEvent event){
 		Player player = event.getPlayer();
@@ -216,8 +210,5 @@ public class listener implements Listener{
 			Bukkit.dispatchCommand(player, "spawn");
 			player.sendMessage(pre + "You have " + ChatColor.WHITE + lives + ChatColor.GRAY + " lives left!");
 		}
-		
 	}
-	
-
 }

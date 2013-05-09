@@ -1,0 +1,50 @@
+name: HavocGames
+version: 0.0.4
+description: Team battles with perks and scores!
+authors: [zizmax, phillipheikoop] 
+website: http://thegulf.enjin.com
+main: com.zizmax.HavocGames.HavocGames
+commands:
+  stats:
+    description: View player statistics!
+  buy:
+    description: Buy perks for prestige and support!
+    aliases: [perks, perk, shop]
+  coins:
+    description: Check coin balance.
+    aliases: [money, balance]
+  broadcast:
+    description: Broadcast message for everyone to see!
+    aliases: [b, br,]
+  ally:
+    description: Ally someone to be on the same team!
+  donate:
+    description: Donate for cool stuff and to help the server!
+  game:
+    description: Check statistics for this game.
+  admin:
+    aliases: [duty, mod]
+    description: Become an admin.
+  play:
+    description: Become a player.
+    aliases: [player]
+  spawn:
+    description: Go back to spawn!
+  ping:
+    description: Ping test!
+  ref:
+    description: Refer players for gold!
+  pick:
+    description: Get a diamond pick for breaking the obsidian!
+  spectate:
+    description: Invisibly view a player.
+    aliases: [s, spec]
+  shout:
+    description: Tell something to everybody!
+    aliases: [scream, yell]
+  start:
+    description: Starts the game right now!
+  armor:
+    description: Does nothing... :(
+  bet:
+    description: Bet on the winner of the match!
