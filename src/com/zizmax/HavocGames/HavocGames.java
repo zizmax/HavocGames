@@ -20,6 +20,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import com.zizmax.HavocGames.Chat;
+import com.zizmax.HavocGames.MainListener;
 
 public final class HavocGames extends JavaPlugin{
     public String pre = ChatColor.GRAY + "[" + ChatColor.GOLD + "HG" + ChatColor.GRAY + "] ";

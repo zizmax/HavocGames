@@ -29,12 +29,12 @@ import org.bukkit.inventory.ItemStack;
 
 public class MainListener implements Listener{
 	private final HavocGames main;
-
+    private String pre;
 	public MainListener(HavocGames plugin) {
 		this.main = plugin;
+		this.pre = main.pre;
 	}
-	String pre = this.main.pre;
-
+		
 	@EventHandler
 	public void playerLogin(PlayerJoinEvent event){
 		String name = event.getPlayer().getName();
@@ -42,8 +42,9 @@ public class MainListener implements Listener{
 	    Chat.sayPlayerMsg(player, "Welcome to " + ChatColor.GOLD + "HavocGames" + ChatColor.GRAY + ", " + ChatColor.AQUA + name + ChatColor.GRAY + "!");
 	    Chat.sayPlayerMsg(player, "Website: " + ChatColor.DARK_AQUA +"zizmax.com" + ChatColor.GRAY + " <--- Click This");
 	    Chat.sayPlayerMsg(player, "Have fun and good luck!");
-	    player.sendMessage(pre + "Game will begin in " + ChatColor.WHITE + main.getTime() + ChatColor.GRAY + " seconds!");
-
+	    Chat.sayPlayerMsg(player, "Game will begin in " + ChatColor.WHITE + (60 - main.getTime()) + ChatColor.GRAY + " seconds!");
+        Chat.sayPlayerMsg(player, main.owners.get(0));
+        // ^^ That prints zizmax just like expected.
 		if(main.owners.contains(player.getName())){
 			event.setJoinMessage(pre + ChatColor.DARK_RED + player.getName() + ChatColor.YELLOW + " the [" + ChatColor.DARK_RED + "Owner" + ChatColor.YELLOW + "] has joined the game!");
 		}
